@@ -1,0 +1,208 @@
+.warehouse {
+  padding-bottom: 2rem;
+}
+
+.warehouse-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #E2E8F0;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #718096;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: #6B46C1;
+}
+
+.tab-btn.active {
+  color: #6B46C1;
+  border-bottom-color: #6B46C1;
+}
+
+.warehouse-content {
+  max-width: 800px;
+}
+
+.warehouse-panel {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.warehouse-panel h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #1a202c;
+}
+
+.warehouse-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #1a202c;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.75rem;
+  border: 2px solid #E2E8F0;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #6B46C1;
+}
+
+.form-group textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+.current-stock-info {
+  padding: 1rem;
+  background: #F7FAFC;
+  border-left: 4px solid #6B46C1;
+  border-radius: 4px;
+  font-size: 1.125rem;
+  color: #1a202c;
+}
+
+.current-stock-info strong {
+  color: #6B46C1;
+  font-size: 1.5rem;
+}
+
+.btn-large {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  margin-top: 0.5rem;
+}
+
+.count-instructions {
+  color: #718096;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.count-table {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+
+.count-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.count-table th {
+  background: #F7FAFC;
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  color: #1a202c;
+  border-bottom: 2px solid #E2E8F0;
+}
+
+.count-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.system-stock {
+  font-weight: 600;
+  color: #6B46C1;
+}
+
+.count-input {
+  width: 100px;
+  padding: 0.5rem;
+  border: 2px solid #E2E8F0;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.count-input:focus {
+  outline: none;
+  border-color: #6B46C1;
+}
+
+.variance {
+  font-weight: 600;
+  color: #718096;
+}
+
+.count-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .warehouse-panel {
+    padding: 1.5rem;
+  }
+  
+  .warehouse-content {
+    max-width: 100%;
+  }
+  
+  .count-table {
+    font-size: 0.875rem;
+  }
+  
+  .count-table th,
+  .count-table td {
+    padding: 0.5rem;
+  }
+  
+  .count-input {
+    width: 80px;
+  }
+  
+  .count-actions {
+    flex-direction: column;
+  }
+  
+  .count-actions button {
+    width: 100%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .warehouse-content {
+    max-width: 1000px;
+  }
+}

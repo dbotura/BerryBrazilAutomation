@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Test - Berry Brazil Açai</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #6b21a8;
+      margin-top: 0;
+    }
+    button {
+      background: #6b21a8;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #7c3aed;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f9fafb;
+      border-radius: 4px;
+      border-left: 4px solid #6b21a8;
+      white-space: pre-wrap;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .error {
+      border-left-color: #dc2626;
+      background: #fef2f2;
+      color: #dc2626;
+    }
+    .success {
+      border-left-color: #16a34a;
+      background: #f0fdf4;
+      color: #16a34a;
+    }
+    .section {
+      margin: 20px 0;
+      padding: 15px;
+      background: #fafafa;
+      border-radius: 4px;
+    }
+    .section h3 {
+      margin-top: 0;
+      color: #374151;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 API Test Suite</h1>
+    <p>Test your Vercel API endpoints locally or in production.</p>
+    
+    <div class="section">
+      <h3>Products API</h3>
+      <button onclick="testGetProducts()">GET /api/products</button>
+      <button onclick="testCreateProduct()">POST /api/products</button>
+    </div>
+
+    <div class="section">
+      <h3>Categories API</h3>
+      <button onclick="testGetCategories()">GET /api/categories</button>
+      <button onclick="testCreateCategory()">POST /api/categories</button>
+    </div>
+
+    <div class="section">
+      <h3>Sales API</h3>
+      <button onclick="testGetSales()">GET /api/sales</button>
+    </div>
+
+    <div class="section">
+      <h3>Stock Movements API</h3>
+      <button onclick="testGetStockMovements()">GET /api/stock-movements</button>
+    </div>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin + '/api';
+
+    function showResult(data, isError = false) {
+      const resultDiv = document.getElementById('result');
+      resultDiv.className = 'result ' + (isError ? 'error' : 'success');
+      resultDiv.textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function testGetProducts() {
+      try {
+        const response = await fetch(`${API_BASE}/products`);
+        const data = await response.json();
+        showResult({ status: response.status, data });
+      } catch (error) {
+        showResult({ error: error.message }, true);
+      }
+    }
+
+    async function testCreateProduct() {
+      try {
+        const product = {
+          name: 'Test Açai Bowl',
+          price: 20.00,
+          stock: 10,
+          minStock: 5,
+          categoryId: 1,
+          unit: 'unit'
+        };
+        const response = await fetch(`${API_BASE}/products`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(product)
+        });
+        const data = await response.json();
+        showResult({ status: response.status, data });
+      } catch (error) {
+        showResult({ error: error.message }, true);
+      }
+    }
+
+    async function testGetCategories() {
+      try {
+        const response = await fetch(`${API_BASE}/categories`);
+        const data = await response.json();
+        showResult({ status: response.status, data });
+      } catch (error) {
+        showResult({ error: error.message }, true);
+      }
+    }
+
+    async function testCreateCategory() {
+      try {
+        const category = {
+          name: 'Test Category',
+          description: 'A test category'
+        };
+        const response = await fetch(`${API_BASE}/categories`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(category)
+        });
+        const data = await response.json();
+        showResult({ status: response.status, data });
+      } catch (error) {
+        showResult({ error: error.message }, true);
+      }
+    }
+
+    async function testGetSales() {
+      try {
+        const response = await fetch(`${API_BASE}/sales`);
+        const data = await response.json();
+        showResult({ status: response.status, data });
+      } catch (error) {
+        showResult({ error: error.message }, true);
+      }
+    }
+
+    async function testGetStockMovements() {
+      try {
+        const response = await fetch(`${API_BASE}/stock-movements`);
+        const data = await response.json();
+        showResult({ status: response.status, data });
+      } catch (error) {
+        showResult({ error: error.message }, true);
+      }
+    }
+  </script>
+</body>
+</html>

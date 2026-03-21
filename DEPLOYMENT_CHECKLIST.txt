@@ -1,0 +1,139 @@
+═══════════════════════════════════════════════════════════════
+  BERRY BRAZIL AÇAI - DEPLOYMENT CHECKLIST
+  Vercel + Neon Migration
+═══════════════════════════════════════════════════════════════
+
+PHASE 1: SETUP ACCOUNTS (5 minutes)
+═══════════════════════════════════════════════════════════════
+☐ Create GitHub account (or login)
+☐ Create Vercel account (use GitHub to sign in)
+☐ Create Neon account (use GitHub to sign in)
+
+PHASE 2: DATABASE SETUP (5 minutes)
+═══════════════════════════════════════════════════════════════
+☐ Login to Neon (https://neon.tech)
+☐ Click "Create Project"
+☐ Name: "acai-stock-db"
+☐ Select region (closest to users)
+☐ Click "Create Project"
+☐ Click "SQL Editor"
+☐ Open schema.sql file
+☐ Copy ALL content
+☐ Paste into Neon SQL Editor
+☐ Click "Run"
+☐ Verify success messages
+☐ (Optional) Run seed-data.sql for sample data
+☐ Go to Dashboard → Connection Details
+☐ Copy connection string (starts with postgresql://)
+☐ Save connection string securely
+
+PHASE 3: GITHUB SETUP (5 minutes)
+═══════════════════════════════════════════════════════════════
+☐ Go to https://github.com/new
+☐ Repository name: "acai-stock-management"
+☐ Description: "Berry Brazil Açai Stock Management"
+☐ Choose Public or Private
+☐ DO NOT initialize with README
+☐ Click "Create repository"
+
+☐ Open terminal in STOCK_CONTROL folder
+☐ Run: git init
+☐ Run: git add .
+☐ Run: git commit -m "Initial deployment"
+☐ Run: git remote add origin [YOUR_REPO_URL]
+☐ Run: git branch -M main
+☐ Run: git push -u origin main
+☐ Verify files uploaded on GitHub
+
+PHASE 4: VERCEL DEPLOYMENT (5 minutes)
+═══════════════════════════════════════════════════════════════
+☐ Login to Vercel (https://vercel.com)
+☐ Click "Add New Project"
+☐ Click "Import" next to your repository
+☐ Verify settings:
+  ☐ Framework: Vite
+  ☐ Root Directory: ./
+  ☐ Build Command: npm run build
+  ☐ Output Directory: dist
+☐ Click "Environment Variables"
+☐ Add variable:
+  ☐ Name: DATABASE_URL
+  ☐ Value: [paste Neon connection string]
+  ☐ Check: Production
+  ☐ Check: Preview
+  ☐ Check: Development
+☐ Click "Deploy"
+☐ Wait for deployment (1-2 minutes)
+☐ Click deployment URL
+☐ Verify app loads
+
+PHASE 5: TESTING (10 minutes)
+═══════════════════════════════════════════════════════════════
+☐ Open your Vercel URL
+☐ Navigate to Products page
+☐ Click "+ Add Product"
+☐ Fill in test product:
+  ☐ Name: "Test Açai Bowl"
+  ☐ Category: "Bowls"
+  ☐ Price: 15.00
+  ☐ Stock: 50
+  ☐ Min Stock: 10
+☐ Click "Save"
+☐ Refresh page
+☐ Verify product still appears
+☐ Open test-api.html in browser
+☐ Test each API endpoint
+☐ Verify all return data
+
+☐ Check Neon dashboard
+☐ Verify data appears in tables
+
+PHASE 6: CONFIGURATION (5 minutes)
+═══════════════════════════════════════════════════════════════
+☐ In Vercel dashboard, go to Settings
+☐ Note your deployment URL
+☐ (Optional) Add custom domain
+☐ (Optional) Configure analytics
+☐ (Optional) Set up monitoring
+
+PHASE 7: DOCUMENTATION (2 minutes)
+═══════════════════════════════════════════════════════════════
+☐ Save Vercel URL
+☐ Save Neon connection string (securely)
+☐ Share URL with team
+☐ Review WHATS_NEXT.md for next steps
+
+═══════════════════════════════════════════════════════════════
+  DEPLOYMENT COMPLETE! 🎉
+═══════════════════════════════════════════════════════════════
+
+Your app is now live at: _________________________________
+
+Next steps:
+☐ Read WHATS_NEXT.md
+☐ Update frontend components to use API
+☐ Add authentication
+☐ Invite team members
+
+═══════════════════════════════════════════════════════════════
+  TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════
+
+Problem: Build fails in Vercel
+Solution: Check build logs, verify package.json, run npm install
+
+Problem: Database connection error
+Solution: Verify DATABASE_URL in Vercel, check connection string
+
+Problem: API returns 404
+Solution: Verify vercel.json exists, check /api folder
+
+Problem: Can't push to GitHub
+Solution: Check git remote, verify authentication
+
+For detailed help, see:
+- VERCEL_DEPLOYMENT.md
+- GITHUB_SETUP.md
+- DOCS_INDEX.md
+
+═══════════════════════════════════════════════════════════════

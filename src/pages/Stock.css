@@ -1,0 +1,57 @@
+.stock {
+  padding-bottom: 2rem;
+}
+
+.stock-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stock-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stock-card.low-stock {
+  border-left: 4px solid #F56565;
+  background: #FFF5F5;
+}
+
+.stock-info {
+  flex: 1;
+}
+
+.stock-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 0.75rem;
+}
+
+.stock-levels {
+  display: flex;
+  gap: 2rem;
+  font-size: 0.875rem;
+  color: #718096;
+}
+
+.stock-current strong {
+  font-size: 1.25rem;
+  color: #1a202c;
+  margin-left: 0.25rem;
+}
+
+.stock-alert {
+  padding: 0.5rem 1rem;
+  background: #FED7D7;
+  color: #C53030;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
