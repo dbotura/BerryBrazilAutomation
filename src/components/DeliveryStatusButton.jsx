@@ -1,14 +1,15 @@
 import { useState } from 'react';
+import AppIcon from './AppIcon';
 
 const DeliveryStatusButton = ({ orderId, currentStatus, onStatusChange }) => {
   const [loading, setLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   const statuses = [
-    { value: 'pending', label: 'Pending', color: '#f59e0b', icon: '⏳' },
-    { value: 'in_transit', label: 'In Transit', color: '#3b82f6', icon: '🚚' },
-    { value: 'delivered', label: 'Delivered', color: '#10b981', icon: '✅' },
-    { value: 'cancelled', label: 'Cancelled', color: '#ef4444', icon: '❌' },
+    { value: 'pending', label: 'Pending', color: '#f59e0b', icon: 'clock' },
+    { value: 'in_transit', label: 'In Transit', color: '#3b82f6', icon: 'truck' },
+    { value: 'delivered', label: 'Delivered', color: '#10b981', icon: 'check' },
+    { value: 'cancelled', label: 'Cancelled', color: '#ef4444', icon: 'close' },
   ];
 
   const currentStatusObj = statuses.find(s => s.value === currentStatus) || statuses[0];
@@ -38,7 +39,7 @@ const DeliveryStatusButton = ({ orderId, currentStatus, onStatusChange }) => {
       const data = await response.json();
       
       if (newStatus === 'delivered') {
-        alert('Order marked as delivered! Invoice has been generated and sent to customer.');
+        alert(data.message || 'Order marked as delivered. Invoice generation attempted.');
       } else {
         alert(`Order status updated to: ${newStatus}`);
       }
@@ -73,7 +74,7 @@ const DeliveryStatusButton = ({ orderId, currentStatus, onStatusChange }) => {
           minWidth: '140px',
         }}
       >
-        <span>{currentStatusObj.icon}</span>
+        <AppIcon name={currentStatusObj.icon} />
         <span>{currentStatusObj.label}</span>
         <span style={{ marginLeft: 'auto' }}>▼</span>
       </button>
@@ -122,7 +123,7 @@ const DeliveryStatusButton = ({ orderId, currentStatus, onStatusChange }) => {
                 }
               }}
             >
-              <span>{status.icon}</span>
+              <AppIcon name={status.icon} />
               <span style={{ color: status.color, fontWeight: 'bold' }}>
                 {status.label}
               </span>

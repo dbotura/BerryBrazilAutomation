@@ -1,86 +1,243 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { api } from '../lib/api'
 import { formatCurrency } from '../utils/currency'
 import './Products.css'
 
+const emptyForm = {
+  name: '',
+  categoryId: '',
+  price: '',
+  stock: '',
+  minStock: '',
+  unit: 'kg',
+}
+
 const Products = () => {
-  const [products, setProducts] = useState([
-    { id: 1, name: 'Açai Bowl 300g', price: 15.00, stock: 45, category: 'Bowls' },
-    { id: 2, name: 'Açai Bowl 500g', price: 22.00, stock: 32, category: 'Bowls' },
-    { id: 3, name: 'Açai Smoothie', price: 12.00, stock: 28, category: 'Smoothies' },
-    { id: 4, name: 'Açai Powder 100g', price: 35.00, stock: 8, category: 'Powder' },
-    { id: 5, name: 'Açai Frozen Pack 1kg', price: 45.00, stock: 15, category: 'Frozen Packs' }
-  ])
-  
+  const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
-  
-  const handleEdit = (product) => {
-    setEditingProduct(product)
+  const [formData, setFormData] = useState(emptyForm)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    loadProductsPage()
+  }, [])
+
+  const loadProductsPage = async () => {
+    try {
+      setLoading(true)
+      setError('')
+      const [productRows, categoryRows] = await Promise.all([
+        api.getProducts(),
+        api.getCategories(),
+      ])
+      setProducts(productRows)
+      setCategories(categoryRows)
+    } catch (loadError) {
+      setError(loadError.message || 'Failed to load products')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const openNewProductForm = () => {
+    setEditingProduct(null)
+    setFormData({
+      ...emptyForm,
+      categoryId: categories[0]?.id ? String(categories[0].id) : '',
+    })
     setShowForm(true)
   }
-  
-  const handleSave = (e) => {
-    e.preventDefault()
-    // Add save logic here - will connect to DynamoDB
+
+  const handleEdit = (product) => {
+    setEditingProduct(product)
+    setFormData({
+      name: product.name || '',
+      categoryId: product.category_id ? String(product.category_id) : '',
+      price: product.price ?? '',
+      stock: product.stock ?? '',
+      minStock: product.min_stock ?? '',
+      unit: product.unit || 'kg',
+    })
+    setShowForm(true)
+  }
+
+  const closeForm = () => {
     setShowForm(false)
     setEditingProduct(null)
+    setFormData(emptyForm)
   }
-  
+
+  const handleFieldChange = (event) => {
+    const { name, value } = event.target
+    setFormData((current) => ({
+      ...current,
+      [name]: value,
+    }))
+  }
+
+  const handleSave = async (event) => {
+    event.preventDefault()
+
+    try {
+      setSaving(true)
+      setError('')
+
+      const payload = {
+        name: formData.name.trim(),
+        categoryId: Number(formData.categoryId),
+        price: Number(formData.price || 0),
+        stock: Number(formData.stock || 0),
+        minStock: Number(formData.minStock || 0),
+        unit: formData.unit.trim() || 'kg',
+      }
+
+      if (editingProduct) {
+        await api.updateProduct({ ...payload, id: editingProduct.id })
+      } else {
+        await api.createProduct(payload)
+      }
+
+      await loadProductsPage()
+      closeForm()
+    } catch (saveError) {
+      setError(saveError.message || 'Failed to save product')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const categoryCountLabel = `${categories.length} ${categories.length === 1 ? 'category' : 'categories'}`
+  const productCountLabel = `${products.length} ${products.length === 1 ? 'product' : 'products'}`
+
   return (
     <div className="products">
       <div className="page-header">
-        <h2 className="page-title">Products</h2>
-        <button className="btn btn-primary" onClick={() => setShowForm(true)}>
+        <div>
+          <h2 className="page-title">Products</h2>
+          <p className="products-subtitle">
+            {productCountLabel} across {categoryCountLabel}
+          </p>
+        </div>
+        <button className="btn btn-primary" onClick={openNewProductForm}>
           + Add Product
         </button>
       </div>
-      
-      {showForm && (
-        <div className="modal-overlay" onClick={() => setShowForm(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+
+      <div className="products-category-strip">
+        {categories.map((category) => (
+          <div key={category.id} className="category-pill">
+            <span className="category-pill-name">{category.name}</span>
+            <span className="category-pill-count">
+              {products.filter((product) => product.category_id === category.id).length}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {error ? <div className="products-message error">{error}</div> : null}
+      {loading ? <div className="products-message">Loading products...</div> : null}
+
+      {!loading && !error ? (
+        <div className="products-list">
+          {products.map((product) => (
+            <div key={product.id} className="product-card">
+              <div className="product-info">
+                <div className="product-topline">
+                  <div className="product-category-badge">{product.category_name || 'Unassigned'}</div>
+                  <span className={`product-stock ${product.stock <= product.min_stock ? 'low' : ''}`}>
+                    Stock: {product.stock}
+                  </span>
+                </div>
+                <h3 className="product-name">{product.name}</h3>
+                <div className="product-details">
+                  <span className="product-price">{formatCurrency(Number(product.price || 0))}</span>
+                  <span className="product-meta">Min: {product.min_stock}</span>
+                  <span className="product-meta">Unit: {product.unit || 'kg'}</span>
+                </div>
+              </div>
+              <button className="btn-edit" onClick={() => handleEdit(product)}>
+                Edit
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {showForm ? (
+        <div className="modal-overlay" onClick={closeForm}>
+          <div className="modal-content" onClick={(event) => event.stopPropagation()}>
             <h3>{editingProduct ? 'Edit Product' : 'New Product'}</h3>
             <form onSubmit={handleSave}>
-              <input type="text" placeholder="Product Name" required />
-              <input 
-                type="text" 
-                placeholder="Category (e.g., Bowls, Smoothies, Powder)" 
-                required 
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleFieldChange}
+                placeholder="Product Name"
+                required
               />
-              <input type="number" step="0.01" placeholder="Price ($)" required />
-              <input type="number" placeholder="Initial Stock" required />
-              <input type="number" placeholder="Minimum Stock Level" required />
+              <select
+                name="categoryId"
+                value={formData.categoryId}
+                onChange={handleFieldChange}
+                required
+              >
+                <option value="">Select category</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="number"
+                name="price"
+                step="0.01"
+                value={formData.price}
+                onChange={handleFieldChange}
+                placeholder="Price ($)"
+                required
+              />
+              <input
+                type="number"
+                name="stock"
+                value={formData.stock}
+                onChange={handleFieldChange}
+                placeholder="Current Stock"
+                required
+              />
+              <input
+                type="number"
+                name="minStock"
+                value={formData.minStock}
+                onChange={handleFieldChange}
+                placeholder="Minimum Stock Level"
+                required
+              />
+              <input
+                type="text"
+                name="unit"
+                value={formData.unit}
+                onChange={handleFieldChange}
+                placeholder="Unit"
+                required
+              />
               <div className="form-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>
+                <button type="button" className="btn btn-secondary" onClick={closeForm}>
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary">
-                  Save
+                <button type="submit" className="btn btn-primary" disabled={saving}>
+                  {saving ? 'Saving...' : 'Save'}
                 </button>
               </div>
             </form>
           </div>
         </div>
-      )}
-      
-      <div className="products-list">
-        {products.map(product => (
-          <div key={product.id} className="product-card">
-            <div className="product-info">
-              <div className="product-category-badge">{product.category}</div>
-              <h3 className="product-name">{product.name}</h3>
-              <div className="product-details">
-                <span className="product-price">{formatCurrency(product.price)}</span>
-                <span className={`product-stock ${product.stock < 10 ? 'low' : ''}`}>
-                  Stock: {product.stock}
-                </span>
-              </div>
-            </div>
-            <button className="btn-edit" onClick={() => handleEdit(product)}>
-              ✏️
-            </button>
-          </div>
-        ))}
-      </div>
+      ) : null}
     </div>
   )
 }

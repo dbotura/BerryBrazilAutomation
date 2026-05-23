@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import AppIcon from '../components/AppIcon'
 import './Warehouse.css'
 
 const Warehouse = () => {
@@ -51,19 +52,19 @@ const Warehouse = () => {
           className={`tab-btn ${activeTab === 'receive' ? 'active' : ''}`}
           onClick={() => setActiveTab('receive')}
         >
-          📦 Receive Stock
+          <AppIcon name="package" className="icon-inline" />Receive Stock
         </button>
         <button 
           className={`tab-btn ${activeTab === 'adjust' ? 'active' : ''}`}
           onClick={() => setActiveTab('adjust')}
         >
-          ✏️ Adjust Stock
+          <AppIcon name="edit" className="icon-inline" />Adjust Stock
         </button>
         <button 
           className={`tab-btn ${activeTab === 'count' ? 'active' : ''}`}
           onClick={() => setActiveTab('count')}
         >
-          📋 Stock Count
+          <AppIcon name="clipboard" className="icon-inline" />Stock Count
         </button>
       </div>
       

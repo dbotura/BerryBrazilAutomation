@@ -1,4 +1,5 @@
-import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
+import React from 'react';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 
 // Styles for the PDF
 const styles = StyleSheet.create({
@@ -142,6 +143,8 @@ const styles = StyleSheet.create({
 
 // Invoice PDF Document Component
 export const InvoiceDocument = ({ invoice, company }) => {
+  const h = React.createElement;
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-AU', {
       style: 'currency',
@@ -161,118 +164,128 @@ export const InvoiceDocument = ({ invoice, company }) => {
   const tax = subtotal * 0.1; // 10% GST
   const total = subtotal + tax;
 
-  return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.companyName}>{company.name}</Text>
-          <Text style={styles.companyDetails}>
-            {company.address}{'\n'}
-            Phone: {company.phone}{'\n'}
-            ABN: {company.taxId}
-          </Text>
-        </View>
-
-        {/* Invoice Title */}
-        <Text style={styles.invoiceTitle}>TAX INVOICE</Text>
-
-        {/* Invoice Details and Customer Info */}
-        <View style={styles.row}>
-          <View style={styles.column}>
-            <Text style={styles.label}>BILL TO:</Text>
-            <Text style={styles.value}>{invoice.customerName || 'Walk-in Customer'}</Text>
-            {invoice.customerEmail && (
-              <Text style={styles.companyDetails}>{invoice.customerEmail}</Text>
-            )}
-            {invoice.customerPhone && (
-              <Text style={styles.companyDetails}>{invoice.customerPhone}</Text>
-            )}
-            {invoice.customerAddress && (
-              <Text style={styles.companyDetails}>{invoice.customerAddress}</Text>
-            )}
-          </View>
-
-          <View style={styles.column}>
-            <View style={{ marginBottom: 10 }}>
-              <Text style={styles.label}>INVOICE NUMBER:</Text>
-              <Text style={styles.value}>{invoice.invoiceNumber}</Text>
-            </View>
-            <View style={{ marginBottom: 10 }}>
-              <Text style={styles.label}>INVOICE DATE:</Text>
-              <Text style={styles.value}>{formatDate(invoice.date)}</Text>
-            </View>
-            {invoice.dueDate && (
-              <View style={{ marginBottom: 10 }}>
-                <Text style={styles.label}>DUE DATE:</Text>
-                <Text style={styles.value}>{formatDate(invoice.dueDate)}</Text>
-              </View>
-            )}
-            {invoice.poNumber && (
-              <View>
-                <Text style={styles.label}>PO NUMBER:</Text>
-                <Text style={styles.value}>{invoice.poNumber}</Text>
-              </View>
-            )}
-          </View>
-        </View>
-
-        {/* Items Table */}
-        <View style={styles.table}>
-          {/* Table Header */}
-          <View style={styles.tableHeader}>
-            <Text style={styles.col1}>DESCRIPTION</Text>
-            <Text style={styles.col2}>QTY</Text>
-            <Text style={styles.col3}>UNIT PRICE</Text>
-            <Text style={styles.col4}>TAX</Text>
-            <Text style={styles.col5}>AMOUNT</Text>
-          </View>
-
-          {/* Table Rows */}
-          {invoice.items.map((item, index) => (
-            <View key={index} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
-              <Text style={styles.col1}>{item.productName}</Text>
-              <Text style={styles.col2}>{item.quantity}</Text>
-              <Text style={styles.col3}>{formatCurrency(item.price)}</Text>
-              <Text style={styles.col4}>GST</Text>
-              <Text style={styles.col5}>{formatCurrency(item.subtotal)}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Totals */}
-        <View style={styles.totalsSection}>
-          <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Subtotal:</Text>
-            <Text style={styles.totalValue}>{formatCurrency(subtotal)}</Text>
-          </View>
-          <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>GST (10%):</Text>
-            <Text style={styles.totalValue}>{formatCurrency(tax)}</Text>
-          </View>
-          <View style={styles.grandTotalRow}>
-            <Text style={styles.grandTotalLabel}>TOTAL:</Text>
-            <Text style={styles.grandTotalValue}>{formatCurrency(total)}</Text>
-          </View>
-        </View>
-
-        {/* Notes */}
-        {invoice.notes && (
-          <View style={styles.notes}>
-            <Text style={styles.notesTitle}>Notes:</Text>
-            <Text style={styles.notesText}>{invoice.notes}</Text>
-          </View>
-        )}
-
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text>
-            Thank you for your business!{'\n'}
-            Payment terms: {invoice.paymentTerms || 'Due on receipt'}
-          </Text>
-        </View>
-      </Page>
-    </Document>
+  return h(
+    Document,
+    null,
+    h(
+      Page,
+      { size: 'A4', style: styles.page },
+      h(
+        View,
+        { style: styles.header },
+        h(Text, { style: styles.companyName }, company.name),
+        h(
+          Text,
+          { style: styles.companyDetails },
+          `${company.address}\nPhone: ${company.phone}\nABN: ${company.taxId}`
+        )
+      ),
+      h(Text, { style: styles.invoiceTitle }, 'TAX INVOICE'),
+      h(
+        View,
+        { style: styles.row },
+        h(
+          View,
+          { style: styles.column },
+          h(Text, { style: styles.label }, 'BILL TO:'),
+          h(Text, { style: styles.value }, invoice.customerName || 'Walk-in Customer'),
+          invoice.customerEmail ? h(Text, { style: styles.companyDetails }, invoice.customerEmail) : null,
+          invoice.customerPhone ? h(Text, { style: styles.companyDetails }, invoice.customerPhone) : null,
+          invoice.customerAddress ? h(Text, { style: styles.companyDetails }, invoice.customerAddress) : null,
+        ),
+        h(
+          View,
+          { style: styles.column },
+          h(
+            View,
+            { style: { marginBottom: 10 } },
+            h(Text, { style: styles.label }, 'INVOICE NUMBER:'),
+            h(Text, { style: styles.value }, invoice.invoiceNumber),
+          ),
+          h(
+            View,
+            { style: { marginBottom: 10 } },
+            h(Text, { style: styles.label }, 'INVOICE DATE:'),
+            h(Text, { style: styles.value }, formatDate(invoice.date)),
+          ),
+          invoice.dueDate
+            ? h(
+                View,
+                { style: { marginBottom: 10 } },
+                h(Text, { style: styles.label }, 'DUE DATE:'),
+                h(Text, { style: styles.value }, formatDate(invoice.dueDate)),
+              )
+            : null,
+          invoice.poNumber
+            ? h(
+                View,
+                null,
+                h(Text, { style: styles.label }, 'PO NUMBER:'),
+                h(Text, { style: styles.value }, invoice.poNumber),
+              )
+            : null,
+        ),
+      ),
+      h(
+        View,
+        { style: styles.table },
+        h(
+          View,
+          { style: styles.tableHeader },
+          h(Text, { style: styles.col1 }, 'DESCRIPTION'),
+          h(Text, { style: styles.col2 }, 'QTY'),
+          h(Text, { style: styles.col3 }, 'UNIT PRICE'),
+          h(Text, { style: styles.col4 }, 'TAX'),
+          h(Text, { style: styles.col5 }, 'AMOUNT'),
+        ),
+        ...invoice.items.map((item, index) =>
+          h(
+            View,
+            { key: index, style: index % 2 === 0 ? styles.tableRow : styles.tableRowAlt },
+            h(Text, { style: styles.col1 }, item.productName),
+            h(Text, { style: styles.col2 }, String(item.quantity)),
+            h(Text, { style: styles.col3 }, formatCurrency(item.price)),
+            h(Text, { style: styles.col4 }, 'GST'),
+            h(Text, { style: styles.col5 }, formatCurrency(item.subtotal)),
+          )
+        ),
+      ),
+      h(
+        View,
+        { style: styles.totalsSection },
+        h(
+          View,
+          { style: styles.totalRow },
+          h(Text, { style: styles.totalLabel }, 'Subtotal:'),
+          h(Text, { style: styles.totalValue }, formatCurrency(subtotal)),
+        ),
+        h(
+          View,
+          { style: styles.totalRow },
+          h(Text, { style: styles.totalLabel }, 'GST (10%):'),
+          h(Text, { style: styles.totalValue }, formatCurrency(tax)),
+        ),
+        h(
+          View,
+          { style: styles.grandTotalRow },
+          h(Text, { style: styles.grandTotalLabel }, 'TOTAL:'),
+          h(Text, { style: styles.grandTotalValue }, formatCurrency(total)),
+        ),
+      ),
+      invoice.notes
+        ? h(
+            View,
+            { style: styles.notes },
+            h(Text, { style: styles.notesTitle }, 'Notes:'),
+            h(Text, { style: styles.notesText }, invoice.notes),
+          )
+        : null,
+      h(
+        View,
+        { style: styles.footer },
+        h(Text, null, `Thank you for your business!\nPayment terms: ${invoice.paymentTerms || 'Due on receipt'}`)
+      ),
+    )
   );
 };
 

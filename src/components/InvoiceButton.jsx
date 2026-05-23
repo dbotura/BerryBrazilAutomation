@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import AppIcon from './AppIcon';
 
 const InvoiceButton = ({ orderId, saleId, customerEmail, onSuccess }) => {
   const [loading, setLoading] = useState(false);
@@ -31,16 +32,7 @@ const InvoiceButton = ({ orderId, saleId, customerEmail, onSuccess }) => {
         throw new Error(errorData.error || 'Failed to generate invoice');
       }
 
-      // Download the PDF
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `invoice-${orderId || saleId}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      await response.blob();
 
       alert(`Invoice generated and sent to ${customerEmail}!`);
       
@@ -77,12 +69,12 @@ const InvoiceButton = ({ orderId, saleId, customerEmail, onSuccess }) => {
       >
         {loading ? (
           <>
-            <span>⏳</span>
+            <AppIcon name="clock" />
             <span>Generating...</span>
           </>
         ) : (
           <>
-            <span>📄</span>
+            <AppIcon name="document" />
             <span>Generate Invoice</span>
           </>
         )}

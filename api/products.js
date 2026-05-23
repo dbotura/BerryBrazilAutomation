@@ -32,10 +32,23 @@ export default async function handler(req, res) {
 
     if (req.method === 'PUT') {
       const { id, name, price, stock, minStock, categoryId, unit } = req.body;
+      const currentRows = await sql`
+        SELECT * FROM products WHERE id = ${id} LIMIT 1
+      `;
+      const current = currentRows[0];
+      if (!current) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+
       const result = await sql`
         UPDATE products 
-        SET name = ${name}, price = ${price}, stock = ${stock}, 
-            min_stock = ${minStock}, category_id = ${categoryId}, unit = ${unit}
+        SET
+            name = ${name ?? current.name},
+            price = ${price ?? current.price},
+            stock = ${stock ?? current.stock},
+            min_stock = ${minStock ?? current.min_stock},
+            category_id = ${categoryId ?? current.category_id},
+            unit = ${unit ?? current.unit}
         WHERE id = ${id}
         RETURNING *
       `;

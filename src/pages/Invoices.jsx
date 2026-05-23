@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import AppIcon from '../components/AppIcon';
 import './Invoices.css';
 
 const Invoices = () => {
@@ -91,7 +92,7 @@ const Invoices = () => {
             className="search-input"
           />
           <button className="btn btn-secondary" onClick={fetchInvoices}>
-            🔄 Refresh
+            <AppIcon name="refresh" className="icon-inline" />Refresh
           </button>
         </div>
       </div>
@@ -158,7 +159,8 @@ const Invoices = () => {
                   </td>
                   <td>
                     <span className={`badge badge-${invoice.type}`}>
-                      {invoice.type === 'order' ? '📦 Order' : '💰 Sale'}
+                      <AppIcon name={invoice.type === 'order' ? 'package' : 'revenue'} className="icon-inline" />
+                      {invoice.type === 'order' ? 'Order' : 'Sale'}
                     </span>
                   </td>
                   <td>
@@ -173,7 +175,7 @@ const Invoices = () => {
                   <td>
                     {invoice.email_sent ? (
                       <span className="status-badge status-success">
-                        ✅ Sent
+                        <AppIcon name="check" className="icon-inline" />Sent
                         {invoice.email_sent_at && (
                           <div className="status-time">
                             {formatDate(invoice.email_sent_at)}
@@ -182,22 +184,22 @@ const Invoices = () => {
                       </span>
                     ) : invoice.email_error ? (
                       <span className="status-badge status-error" title={invoice.email_error}>
-                        ❌ Failed
+                        <AppIcon name="close" className="icon-inline" />Failed
                       </span>
                     ) : (
                       <span className="status-badge status-pending">
-                        ⏳ Pending
+                        <AppIcon name="clock" className="icon-inline" />Pending
                       </span>
                     )}
                   </td>
                   <td>
                     {invoice.pdf_url ? (
                       <span className="status-badge status-success">
-                        ✅ Stored
+                        <AppIcon name="check" className="icon-inline" />Stored
                       </span>
                     ) : (
                       <span className="status-badge status-warning">
-                        ⚠️ Not stored
+                        <AppIcon name="alert" className="icon-inline" />Not stored
                       </span>
                     )}
                   </td>
@@ -209,7 +211,7 @@ const Invoices = () => {
                           onClick={() => handleDownload(invoice.pdf_url, invoice.invoice_number)}
                           title="Download PDF"
                         >
-                          📄
+                          <AppIcon name="document" />
                         </button>
                       )}
                       {invoice.customer_email && (
@@ -218,7 +220,7 @@ const Invoices = () => {
                           onClick={() => alert('Resend feature coming soon!')}
                           title="Resend Email"
                         >
-                          📧
+                          <AppIcon name="mail" />
                         </button>
                       )}
                     </div>

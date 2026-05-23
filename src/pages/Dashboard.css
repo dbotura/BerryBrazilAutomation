@@ -25,7 +25,24 @@
 }
 
 .stat-icon {
-  font-size: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 7px;
+  background: #f2f5f8;
+  color: #516176;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon .app-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.stat-card.alert .stat-icon {
+  background: #fee2e2;
+  color: #b91c1c;
 }
 
 .stat-content {

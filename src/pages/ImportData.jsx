@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import AppIcon from '../components/AppIcon'
 import { formatCurrency, formatDate } from '../utils/currency'
 import './ImportData.css'
 
@@ -98,26 +99,26 @@ const ImportData = () => {
           className={`tab-btn ${activeTab === 'sales' ? 'active' : ''}`}
           onClick={() => setActiveTab('sales')}
         >
-          📊 Sales History
+          <AppIcon name="chart" className="icon-inline" />Sales History
         </button>
         <button 
           className={`tab-btn ${activeTab === 'products' ? 'active' : ''}`}
           onClick={() => setActiveTab('products')}
         >
-          🫐 Products
+          <AppIcon name="product" className="icon-inline" />Products
         </button>
         <button 
           className={`tab-btn ${activeTab === 'stock' ? 'active' : ''}`}
           onClick={() => setActiveTab('stock')}
         >
-          📦 Stock Movements
+          <AppIcon name="package" className="icon-inline" />Stock Movements
         </button>
       </div>
       
       <div className="import-content">
         {/* Instructions */}
         <div className="import-instructions">
-          <h3>📋 How to Import {activeTab === 'sales' ? 'Sales History' : activeTab === 'products' ? 'Products' : 'Stock Movements'}</h3>
+          <h3><AppIcon name="clipboard" className="icon-inline" />How to Import {activeTab === 'sales' ? 'Sales History' : activeTab === 'products' ? 'Products' : 'Stock Movements'}</h3>
           
           {activeTab === 'sales' && (
             <div className="instructions-list">
@@ -184,7 +185,7 @@ const ImportData = () => {
             className="btn btn-secondary"
             onClick={() => downloadTemplate(activeTab)}
           >
-            📥 Download CSV Template
+            <AppIcon name="download" className="icon-inline" />Download CSV Template
           </button>
         </div>
         
@@ -201,7 +202,11 @@ const ImportData = () => {
               className="file-input"
             />
             <label htmlFor="csv-upload" className="file-label">
-              {file ? `📄 ${file.name}` : '📁 Choose CSV File'}
+              {file ? (
+                <><AppIcon name="file" className="icon-inline" />{file.name}</>
+              ) : (
+                <><AppIcon name="folder" className="icon-inline" />Choose CSV File</>
+              )}
             </label>
           </div>
           
@@ -254,7 +259,7 @@ const ImportData = () => {
             <div className={`import-result ${importResult.success ? 'success' : 'error'}`}>
               {importResult.success ? (
                 <>
-                  <div className="result-icon">✅</div>
+                  <div className="result-icon"><AppIcon name="check" /></div>
                   <div className="result-content">
                     <h4>Import Successful!</h4>
                     <p>Successfully imported {importResult.imported} records.</p>
@@ -265,7 +270,7 @@ const ImportData = () => {
                 </>
               ) : (
                 <>
-                  <div className="result-icon">❌</div>
+                  <div className="result-icon"><AppIcon name="close" /></div>
                   <div className="result-content">
                     <h4>Import Failed</h4>
                     <p>{importResult.message}</p>
@@ -278,7 +283,7 @@ const ImportData = () => {
         
         {/* Tips */}
         <div className="import-tips">
-          <h4>💡 Tips for Successful Import</h4>
+          <h4><AppIcon name="idea" className="icon-inline" />Tips for Successful Import</h4>
           <ul>
             <li>Ensure dates are in YYYY-MM-DD format (e.g., 2026-01-31)</li>
             <li>Product names must match exactly with existing products</li>

@@ -2,14 +2,25 @@
 
 Complete guide to storing, retrieving, and managing invoice PDFs.
 
-## 📦 Storage Solution: Vercel Blob
+## 📦 Storage Solution: Vercel Blob + Optional Google Drive
 
-We use **Vercel Blob Storage** to store invoice PDFs. It's:
+The invoice flow stores PDFs in **Vercel Blob Storage** first and can also copy them into **Google Drive**. Blob remains the primary URL source saved to the database when available. Google Drive works as an extra storage destination and fallback URL if Blob is unavailable.
+
+### Vercel Blob
+
+We use **Vercel Blob Storage** because it's:
 - Serverless and scalable
 - Integrated with Vercel
 - Public or private access
 - Automatic CDN distribution
 - Pay-as-you-go pricing
+
+### Google Drive
+
+Google Drive is useful when you also want:
+- a human-browsable invoice archive
+- a shared team folder outside Vercel
+- a secondary copy of each generated PDF
 
 ## 🔧 Setup (5 minutes)
 
@@ -49,6 +60,37 @@ git push
 
 Vercel will automatically set up blob storage on deployment.
 
+### Step 5: Enable Google Drive (Optional)
+
+Add these environment variables if you want PDF copies uploaded to Drive:
+
+```bash
+GOOGLE_DRIVE_ENABLED=true
+GOOGLE_DRIVE_TEST_FOLDER_ID=your_google_drive_test_folder_id
+# GOOGLE_DRIVE_FOLDER_ID=your_google_drive_production_folder_id
+```
+
+Then configure one auth method:
+
+```bash
+# OAuth refresh token
+GOOGLE_OAUTH_CLIENT_ID=your-google-oauth-client-id.apps.googleusercontent.com
+GOOGLE_OAUTH_CLIENT_SECRET=your-google-oauth-client-secret
+GOOGLE_OAUTH_REFRESH_TOKEN=your-google-oauth-refresh-token
+```
+
+```bash
+# Service account
+GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL=invoice-drive-uploader@your-project.iam.gserviceaccount.com
+GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+```
+
+Behavior:
+- test mode uses `GOOGLE_DRIVE_TEST_FOLDER_ID`
+- production mode uses `GOOGLE_DRIVE_FOLDER_ID`
+- if Blob upload succeeds and Drive upload fails, the invoice still completes
+- if Blob upload fails and Drive upload succeeds, the Drive URL is saved as `pdf_url`
+
 ## 📍 How PDFs Are Stored
 
 ### Automatic Storage
@@ -57,8 +99,8 @@ When an invoice is generated:
 
 1. PDF is created in memory
 2. Uploaded to Vercel Blob: `invoices/{invoice-number}.pdf`
-3. Public URL is returned: `https://xxxxx.public.blob.vercel-storage.com/invoices/INV-2024-000001.pdf`
-4. URL is saved to database
+3. Optionally copied to Google Drive
+4. The best available URL is saved to database
 5. PDF is attached to email
 
 ### Storage Location
@@ -69,6 +111,14 @@ Vercel Blob Storage
     ├── INV-2024-000001.pdf
     ├── INV-2024-000002.pdf
     ├── INV-2024-000003.pdf
+    └── ...
+```
+
+```text
+Google Drive
+└── Test or Production Folder
+    ├── TEST-invoice-INV-2024-000001.pdf
+    ├── invoice-INV-2024-000002.pdf
     └── ...
 ```
 

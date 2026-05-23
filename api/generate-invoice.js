@@ -3,6 +3,11 @@ import { put } from '@vercel/blob';
 import { getDb, corsHeaders } from './db.js';
 import { InvoiceDocument } from './lib/invoice-template.js';
 import { sendInvoiceEmail } from './lib/email-service.js';
+import {
+  getInvoiceAttachmentName,
+  resolveInvoiceEmailRecipient,
+} from './lib/invoice-test-mode.js';
+import { isGoogleDriveUploadEnabled, uploadInvoicePdfToGoogleDrive } from './lib/google-drive.js';
 
 export default async function handler(req, res) {
   const headers = corsHeaders();
@@ -103,19 +108,35 @@ export default async function handler(req, res) {
       InvoiceDocument({ invoice, company })
     );
 
-    // Store PDF in Vercel Blob Storage
+    // Store PDF in Vercel Blob Storage and optionally Google Drive.
+    let blobUrl = null;
+    let driveUrl = null;
     let pdfUrl = null;
     try {
       const blob = await put(`invoices/${invoiceNumber}.pdf`, pdfBuffer, {
         access: 'public',
         contentType: 'application/pdf',
       });
-      pdfUrl = blob.url;
-      console.log('PDF stored at:', pdfUrl);
+      blobUrl = blob.url;
+      console.log('PDF stored in blob at:', blobUrl);
     } catch (blobError) {
       console.error('Failed to store PDF in blob storage:', blobError);
-      // Continue even if storage fails - we can still send the email
     }
+
+    if (isGoogleDriveUploadEnabled()) {
+      try {
+        const driveFile = await uploadInvoicePdfToGoogleDrive({
+          fileName: getInvoiceAttachmentName(invoiceNumber),
+          pdfBuffer,
+        });
+        driveUrl = driveFile?.url || null;
+        console.log('PDF stored in Google Drive at:', driveUrl);
+      } catch (driveError) {
+        console.error('Failed to store PDF in Google Drive:', driveError);
+      }
+    }
+
+    pdfUrl = blobUrl || driveUrl;
 
     // Update database with invoice number and PDF URL
     if (saleId) {
@@ -131,7 +152,8 @@ export default async function handler(req, res) {
         UPDATE orders 
         SET invoice_number = ${invoiceNumber},
             invoice_generated_at = NOW(),
-            invoice_pdf_url = ${pdfUrl}
+            invoice_pdf_url = ${pdfUrl},
+            status = 'completed'
         WHERE id = ${orderId}
       `;
     }
@@ -158,13 +180,17 @@ export default async function handler(req, res) {
 
     // Send email if requested and customer email exists
     let emailResult = null;
-    if (sendEmail && invoiceData.customer_email) {
+    const emailConfig = resolveInvoiceEmailRecipient(invoiceData.customer_email);
+    const emailSendingEnabled = sendEmail && Boolean(process.env.RESEND_API_KEY);
+
+    if (emailSendingEnabled && emailConfig.recipient) {
       try {
         emailResult = await sendInvoiceEmail({
-          to: invoiceData.customer_email,
+          to: emailConfig.recipient,
           invoiceNumber,
           pdfBuffer,
           customerName: invoiceData.customer,
+          originalRecipient: emailConfig.originalRecipient,
           pdfUrl, // Include URL in email for download link
         });
 
@@ -188,6 +214,12 @@ export default async function handler(req, res) {
         
         emailResult = { success: false, error: emailError.message };
       }
+    } else if (sendEmail) {
+      console.warn(
+        !process.env.RESEND_API_KEY
+          ? 'Invoice email skipped because RESEND_API_KEY is not configured'
+          : 'Invoice email skipped because no recipient was available'
+      );
     }
 
     // Return PDF as response

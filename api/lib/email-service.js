@@ -1,13 +1,36 @@
 import { Resend } from 'resend';
+import {
+  getInvoiceAttachmentName,
+  getInvoiceEmailSubject,
+  isInvoiceTestMode,
+} from './invoice-test-mode.js';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResendClient() {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error('RESEND_API_KEY is not configured');
+  }
 
-export async function sendInvoiceEmail({ to, invoiceNumber, pdfBuffer, customerName }) {
+  return new Resend(process.env.RESEND_API_KEY);
+}
+
+export async function sendInvoiceEmail({ to, invoiceNumber, pdfBuffer, customerName, originalRecipient }) {
   try {
+    const resend = getResendClient();
+    const subject = getInvoiceEmailSubject(invoiceNumber);
+    const attachmentName = getInvoiceAttachmentName(invoiceNumber);
+    const testModeNotice = isInvoiceTestMode()
+      ? `
+            <div style="background: #fff7ed; border: 1px solid #fdba74; color: #9a3412; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+              <strong>Test Mode:</strong> This invoice email was redirected for testing.
+              ${originalRecipient ? `<br/>Original customer email: ${originalRecipient}` : ''}
+            </div>
+        `
+      : '';
+
     const { data, error } = await resend.emails.send({
       from: process.env.COMPANY_EMAIL || 'invoices@yourdomain.com',
       to: to,
-      subject: `Invoice ${invoiceNumber} - ${process.env.COMPANY_NAME || 'Berry Brazil Açai'}`,
+      subject,
       html: `
         <!DOCTYPE html>
         <html>
@@ -76,6 +99,7 @@ export async function sendInvoiceEmail({ to, invoiceNumber, pdfBuffer, customerN
           </div>
           
           <div class="content">
+            ${testModeNotice}
             <p>Dear ${customerName || 'Valued Customer'},</p>
             
             <p>Thank you for your order! Please find your invoice attached to this email.</p>
@@ -109,7 +133,7 @@ export async function sendInvoiceEmail({ to, invoiceNumber, pdfBuffer, customerN
       `,
       attachments: [
         {
-          filename: `invoice-${invoiceNumber}.pdf`,
+          filename: attachmentName,
           content: pdfBuffer,
         },
       ],
@@ -127,14 +151,22 @@ export async function sendInvoiceEmail({ to, invoiceNumber, pdfBuffer, customerN
   }
 }
 
-export async function sendInvoiceEmailPlainText({ to, invoiceNumber, pdfBuffer, customerName }) {
+export async function sendInvoiceEmailPlainText({ to, invoiceNumber, pdfBuffer, customerName, originalRecipient }) {
   // Fallback plain text version
   try {
+    const resend = getResendClient();
+    const subject = getInvoiceEmailSubject(invoiceNumber);
+    const attachmentName = getInvoiceAttachmentName(invoiceNumber);
+    const testModeNotice = isInvoiceTestMode()
+      ? `TEST MODE: This invoice email was redirected for testing.${originalRecipient ? ` Original customer email: ${originalRecipient}` : ''}\n\n`
+      : '';
+
     const { data, error } = await resend.emails.send({
       from: process.env.COMPANY_EMAIL || 'invoices@yourdomain.com',
       to: to,
-      subject: `Invoice ${invoiceNumber} - ${process.env.COMPANY_NAME || 'Berry Brazil Açai'}`,
+      subject,
       text: `
+${testModeNotice}\
 Dear ${customerName || 'Valued Customer'},
 
 Thank you for your order!
@@ -155,7 +187,7 @@ This is an automated email. Please do not reply directly to this message.
       `,
       attachments: [
         {
-          filename: `invoice-${invoiceNumber}.pdf`,
+          filename: attachmentName,
           content: pdfBuffer,
         },
       ],

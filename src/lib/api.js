@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.PROD ? '/api' : 'http://localhost:3000/api';
+const API_BASE = '/api';
 
 async function fetchAPI(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
@@ -23,6 +23,13 @@ async function fetchAPI(endpoint, options = {}) {
 }
 
 export const api = {
+  // Line Flow
+  getLineFlow: () => fetchAPI('/line-flow'),
+  updateLineFlowForecast: (data) =>
+    fetchAPI('/line-flow', { method: 'PUT', body: JSON.stringify(data) }),
+  commitLineFlowTarget: (data) =>
+    fetchAPI('/line-flow', { method: 'POST', body: JSON.stringify(data) }),
+
   // Products
   getProducts: () => fetchAPI('/products'),
   createProduct: (data) => fetchAPI('/products', { method: 'POST', body: JSON.stringify(data) }),
@@ -36,6 +43,10 @@ export const api = {
   // Sales
   getSales: () => fetchAPI('/sales'),
   createSale: (data) => fetchAPI('/sales', { method: 'POST', body: JSON.stringify(data) }),
+
+  // Orders
+  getOrders: () => fetchAPI('/orders'),
+  createOrder: (data) => fetchAPI('/orders', { method: 'POST', body: JSON.stringify(data) }),
 
   // Stock Movements
   getStockMovements: (productId) => 

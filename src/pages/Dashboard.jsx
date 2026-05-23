@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import AppIcon from '../components/AppIcon'
 import { formatCurrency } from '../utils/currency'
 import './Dashboard.css'
 
@@ -88,7 +89,7 @@ const Dashboard = () => {
       
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon">💰</div>
+          <div className="stat-icon"><AppIcon name="revenue" /></div>
           <div className="stat-content">
             <div className="stat-label">Today's Sales</div>
             <div className="stat-value">{formatCurrency(stats.todaySales)}</div>
@@ -96,7 +97,7 @@ const Dashboard = () => {
         </div>
         
         <div className="stat-card">
-          <div className="stat-icon">📈</div>
+          <div className="stat-icon"><AppIcon name="trendUp" /></div>
           <div className="stat-content">
             <div className="stat-label">This Week</div>
             <div className="stat-value">{formatCurrency(stats.weekSales)}</div>
@@ -104,7 +105,7 @@ const Dashboard = () => {
         </div>
         
         <div className="stat-card">
-          <div className="stat-icon">📊</div>
+          <div className="stat-icon"><AppIcon name="chart" /></div>
           <div className="stat-content">
             <div className="stat-label">This Month</div>
             <div className="stat-value">{formatCurrency(stats.monthSales)}</div>
@@ -112,7 +113,7 @@ const Dashboard = () => {
         </div>
         
         <div className="stat-card alert">
-          <div className="stat-icon">⚠️</div>
+          <div className="stat-icon"><AppIcon name="alert" /></div>
           <div className="stat-content">
             <div className="stat-label">Low Stock Items</div>
             <div className="stat-value">{stats.lowStock}</div>

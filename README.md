@@ -58,9 +58,9 @@ This project has been migrated from AWS to Vercel + Neon PostgreSQL for simpler 
 - AWS Account (free tier)
 - AWS CLI installed and configured
 
-### Local Development (Optional - for testing only)
+### Local Development
 
-**Note: This is only for testing before deployment. Production runs on Vercel.**
+Use local development first. It is the fastest way to validate the frontend against the serverless API routes before dealing with Vercel environment setup.
 
 1. Install dependencies:
 ```bash
@@ -73,12 +73,16 @@ cp .env.example .env.local
 # Edit .env.local with your Neon database URL
 ```
 
-3. Run development server:
+3. Run the local app:
 ```bash
 npm run dev
 ```
 
-Visit http://localhost:3000 to test locally.
+This starts:
+- Frontend: `http://localhost:5173`
+- Local API server: `http://localhost:3000`
+
+The frontend proxies `/api` requests to the local API server, which executes the same handlers from the `/api` directory that Vercel will use in production.
 
 ### Vercel Deployment (Production)
 

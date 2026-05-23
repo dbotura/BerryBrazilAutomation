@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import AppIcon from '../components/AppIcon'
 import { formatCurrency, formatDate } from '../utils/currency'
 import './PurchaseOrders.css'
 
@@ -110,7 +111,7 @@ const PurchaseOrders = () => {
       {/* Summary Cards */}
       <div className="po-summary">
         <div className="summary-card">
-          <div className="summary-icon">📦</div>
+          <div className="summary-icon"><AppIcon name="package" /></div>
           <div className="summary-content">
             <div className="summary-label">Active POs</div>
             <div className="summary-value">{activePOs.length}</div>
@@ -118,7 +119,7 @@ const PurchaseOrders = () => {
         </div>
         
         <div className="summary-card">
-          <div className="summary-icon">💰</div>
+          <div className="summary-icon"><AppIcon name="revenue" /></div>
           <div className="summary-content">
             <div className="summary-label">Total Value</div>
             <div className="summary-value">
@@ -128,7 +129,7 @@ const PurchaseOrders = () => {
         </div>
         
         <div className="summary-card alert">
-          <div className="summary-icon">⏰</div>
+          <div className="summary-icon"><AppIcon name="clock" /></div>
           <div className="summary-content">
             <div className="summary-label">Due This Week</div>
             <div className="summary-value">
@@ -161,7 +162,7 @@ const PurchaseOrders = () => {
             <div className="po-header">
               <div className="po-header-left">
                 <h3 className="po-number">{po.poNumber}</h3>
-                <div className="po-supplier">📍 {po.supplier}</div>
+                <div className="po-supplier"><AppIcon name="location" className="icon-inline" />{po.supplier}</div>
               </div>
               <div className="po-header-right">
                 <span className={`po-status ${getStatusClass(po.status)}`}>
@@ -233,11 +234,11 @@ const PurchaseOrders = () => {
             <div className="po-header">
               <div className="po-header-left">
                 <h3 className="po-number">{po.poNumber}</h3>
-                <div className="po-supplier">📍 {po.supplier}</div>
+                <div className="po-supplier"><AppIcon name="location" className="icon-inline" />{po.supplier}</div>
               </div>
               <div className="po-header-right">
                 <span className={`po-status ${getStatusClass(po.status)}`}>
-                  ✓ {getStatusLabel(po.status)}
+                  <AppIcon name="check" className="icon-inline" />{getStatusLabel(po.status)}
                 </span>
               </div>
             </div>

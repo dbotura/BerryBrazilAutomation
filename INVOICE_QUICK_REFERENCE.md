@@ -12,12 +12,30 @@
 
 ```bash
 RESEND_API_KEY=re_xxxxxxxxxxxx
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_xxxxxxxxxxxx
+INVOICE_TEST_MODE=true
+INVOICE_TEST_RECIPIENT=your-test-inbox@example.com
+GOOGLE_DRIVE_ENABLED=true
+GOOGLE_DRIVE_TEST_FOLDER_ID=your_google_drive_test_folder_id
+# GOOGLE_DRIVE_FOLDER_ID=your_google_drive_production_folder_id
+# GOOGLE_OAUTH_CLIENT_ID=your-google-oauth-client-id.apps.googleusercontent.com
+# GOOGLE_OAUTH_CLIENT_SECRET=your-google-oauth-client-secret
+# GOOGLE_OAUTH_REFRESH_TOKEN=your-google-oauth-refresh-token
+# GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL=invoice-drive-uploader@your-project.iam.gserviceaccount.com
+# GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 COMPANY_EMAIL=invoices@yourdomain.com
 COMPANY_NAME=Berry Brazil Açai
 COMPANY_ADDRESS=123 Açai Street, Sydney NSW 2000
 COMPANY_PHONE=+61 2 1234 5678
 COMPANY_TAX_ID=12 345 678 901
 ```
+
+## Google Drive Notes
+
+- `GOOGLE_DRIVE_TEST_FOLDER_ID` is used while `INVOICE_TEST_MODE=true`
+- `GOOGLE_DRIVE_FOLDER_ID` is used for production uploads
+- Use OAuth credentials for a personal Drive folder
+- Use a service account for a Shared Drive or a folder shared with that service account
 
 ## 🔌 API Endpoints
 
@@ -105,6 +123,11 @@ tableHeader: { backgroundColor: '#YOUR_COLOR' }
 - Resend Dashboard → Logs
 - View delivery status
 - Check for errors
+
+### Check Google Drive Uploads
+- Open your configured Drive test folder
+- Confirm the uploaded PDF name matches `TEST-invoice-...`
+- If uploads fail, check local server logs for the Google API error
 
 ### Check Generated Invoices
 ```sql

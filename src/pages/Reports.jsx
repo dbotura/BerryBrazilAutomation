@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import AppIcon from '../components/AppIcon'
 import { formatCurrency, formatDate } from '../utils/currency'
 import './Reports.css'
 
@@ -47,7 +48,7 @@ const Reports = () => {
         </div>
         
         <button className="btn btn-primary" onClick={exportReport}>
-          📥 Export CSV
+          <AppIcon name="download" className="icon-inline" />Export CSV
         </button>
       </div>
       

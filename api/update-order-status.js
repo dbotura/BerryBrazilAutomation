@@ -1,4 +1,5 @@
 import { getDb, corsHeaders } from './db.js';
+import { getInvoiceTestRecipient, isInvoiceTestMode } from './lib/invoice-test-mode.js';
 
 export default async function handler(req, res) {
   const headers = corsHeaders();
@@ -45,11 +46,12 @@ export default async function handler(req, res) {
     const order = result[0];
 
     // If status is 'delivered', automatically generate and send invoice
-    if (status === 'delivered' && order.customer_email) {
+    if (status === 'delivered' && (order.customer_email || getInvoiceTestRecipient())) {
       try {
         // Call the invoice generation endpoint internally
+        const requestOrigin = req.headers?.origin || `http://localhost:${process.env.API_PORT || 3000}`;
         const invoiceResponse = await fetch(
-          `${req.headers.origin || 'http://localhost:3000'}/api/generate-invoice`,
+          `${requestOrigin}/api/generate-invoice`,
           {
             method: 'POST',
             headers: {
@@ -77,7 +79,9 @@ export default async function handler(req, res) {
       success: true,
       order,
       message: status === 'delivered' 
-        ? 'Order marked as delivered. Invoice will be generated and sent.'
+        ? isInvoiceTestMode()
+          ? `Order marked as delivered. Invoice will be generated in test mode and sent to ${getInvoiceTestRecipient() || 'the configured test recipient'}.`
+          : 'Order marked as delivered. Invoice will be generated and sent.'
         : 'Order status updated successfully'
     });
 

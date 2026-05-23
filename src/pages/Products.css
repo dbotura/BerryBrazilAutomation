@@ -9,6 +9,60 @@
   margin-bottom: 1.5rem;
 }
 
+.products-subtitle {
+  margin-top: 0.35rem;
+  color: #5f6b7a;
+}
+
+.products-category-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.category-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 0.95rem;
+  background: #f4f7f0;
+  border: 1px solid #dce5d2;
+  border-radius: 999px;
+}
+
+.category-pill-name {
+  color: #29422d;
+  font-weight: 600;
+}
+
+.category-pill-count {
+  min-width: 1.8rem;
+  height: 1.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #d7e8c9;
+  color: #29422d;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.products-message {
+  padding: 1rem 1.1rem;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  background: #f5f7fa;
+  color: #243447;
+}
+
+.products-message.error {
+  background: #fff1f1;
+  color: #b42318;
+  border: 1px solid #f6c7c7;
+}
+
 .products-list {
   display: flex;
   flex-direction: column;
@@ -17,27 +71,36 @@
 
 .product-card {
   background: white;
-  border-radius: 8px;
+  border-radius: 14px;
   padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e4e9ef;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
 }
 
 .product-info {
   flex: 1;
 }
 
+.product-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
 .product-category-badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  background: #EDF2F7;
-  color: #6B46C1;
+  background: #edf7e6;
+  color: #365c2f;
   border-radius: 12px;
   font-size: 0.75rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
   text-transform: uppercase;
 }
 
@@ -52,12 +115,18 @@
   display: flex;
   gap: 1rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .product-price {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #6B46C1;
+  color: #1f5c33;
+}
+
+.product-meta {
+  color: #5f6b7a;
+  font-size: 0.95rem;
 }
 
 .product-stock {
@@ -75,17 +144,19 @@
 }
 
 .btn-edit {
-  background: #EDF2F7;
-  border: none;
-  border-radius: 6px;
-  padding: 0.5rem 0.75rem;
-  font-size: 1.25rem;
+  background: #f5f7fa;
+  border: 1px solid #d8dfe7;
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .btn-edit:hover {
-  background: #E2E8F0;
+  background: #eef3f7;
+  border-color: #b9c7d4;
 }
 
 .modal-overlay {
@@ -121,11 +192,13 @@
   gap: 1rem;
 }
 
-.modal-content input {
+.modal-content input,
+.modal-content select {
   padding: 0.75rem;
   border: 1px solid #E2E8F0;
   border-radius: 6px;
   font-size: 1rem;
+  background: #fff;
 }
 
 .form-actions {
@@ -136,4 +209,26 @@
 
 .form-actions button {
   flex: 1;
+}
+
+@media (max-width: 720px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .product-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-edit {
+    width: 100%;
+  }
+
+  .product-topline {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

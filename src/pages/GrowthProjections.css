@@ -29,7 +29,19 @@
 }
 
 .status-icon {
-  font-size: 36px;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 7px;
+  background: #f2f5f8;
+  color: #516176;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-icon .app-icon {
+  width: 1.3rem;
+  height: 1.3rem;
 }
 
 .status-content {
@@ -75,6 +87,8 @@
   border-bottom: 3px solid transparent;
   margin-bottom: -2px;
   transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
 }
 
 .tab:hover {

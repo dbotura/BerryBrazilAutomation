@@ -3,6 +3,7 @@ import {
   LineChart, Line, BarChart, Bar, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts';
+import AppIcon from '../components/AppIcon';
 import './Forecasting.css';
 
 const Forecasting = () => {
@@ -55,9 +56,9 @@ const Forecasting = () => {
   };
 
   const getTrendIcon = (direction) => {
-    if (direction === 'up') return '📈';
-    if (direction === 'down') return '📉';
-    return '➡️';
+    if (direction === 'up') return 'trendUp';
+    if (direction === 'down') return 'trendDown';
+    return 'trendFlat';
   };
 
   // Combine historical and forecast data for charts
@@ -118,13 +119,13 @@ const Forecasting = () => {
             className={`toggle-btn ${view === 'weekly' ? 'active' : ''}`}
             onClick={() => setView('weekly')}
           >
-            📅 Weekly
+            <AppIcon name="calendar" className="icon-inline" />Weekly
           </button>
           <button
             className={`toggle-btn ${view === 'monthly' ? 'active' : ''}`}
             onClick={() => setView('monthly')}
           >
-            📆 Monthly
+            <AppIcon name="calendar" className="icon-inline" />Monthly
           </button>
         </div>
       </div>
@@ -132,7 +133,7 @@ const Forecasting = () => {
       {/* Key Metrics Dashboard */}
       <div className="metrics-grid">
         <div className="metric-card">
-          <div className="metric-icon">💰</div>
+          <div className="metric-icon"><AppIcon name="revenue" /></div>
           <div className="metric-content">
             <div className="metric-label">Total Revenue ({view})</div>
             <div className="metric-value">{formatCurrency(data.metrics.totalRevenue)}</div>
@@ -143,7 +144,7 @@ const Forecasting = () => {
         </div>
 
         <div className="metric-card">
-          <div className="metric-icon">📦</div>
+          <div className="metric-icon"><AppIcon name="package" /></div>
           <div className="metric-content">
             <div className="metric-label">Total Units Sold</div>
             <div className="metric-value">{formatNumber(data.metrics.totalQuantity)}</div>
@@ -152,7 +153,7 @@ const Forecasting = () => {
         </div>
 
         <div className="metric-card forecast">
-          <div className="metric-icon">🔮</div>
+          <div className="metric-icon"><AppIcon name="chart" /></div>
           <div className="metric-content">
             <div className="metric-label">Forecast Revenue</div>
             <div className="metric-value">{formatCurrency(data.metrics.forecastRevenue)}</div>
@@ -163,7 +164,7 @@ const Forecasting = () => {
         </div>
 
         <div className="metric-card">
-          <div className="metric-icon">📊</div>
+          <div className="metric-icon"><AppIcon name="chart" /></div>
           <div className="metric-content">
             <div className="metric-label">Avg {view === 'weekly' ? 'Weekly' : 'Monthly'}</div>
             <div className="metric-value">{formatCurrency(data.metrics.avgRevenue)}</div>
@@ -256,7 +257,7 @@ const Forecasting = () => {
               <div className="category-header">
                 <h4>{category.name}</h4>
                 <span className={`trend-badge ${category.trendDirection}`}>
-                  {getTrendIcon(category.trendDirection)} {category.trend}%
+                  <AppIcon name={getTrendIcon(category.trendDirection)} className="icon-inline" />{category.trend}%
                 </span>
               </div>
               
@@ -381,7 +382,7 @@ const Forecasting = () => {
         <h3 className="section-title">Key Insights</h3>
         <div className="insights-grid">
           <div className="insight-card">
-            <div className="insight-icon">📈</div>
+            <div className="insight-icon"><AppIcon name="trendUp" /></div>
             <div className="insight-content">
               <h4>Growth Trend</h4>
               <p>
@@ -392,7 +393,7 @@ const Forecasting = () => {
           </div>
 
           <div className="insight-card">
-            <div className="insight-icon">🎯</div>
+            <div className="insight-icon"><AppIcon name="target" /></div>
             <div className="insight-content">
               <h4>Forecast Accuracy</h4>
               <p>
@@ -403,7 +404,7 @@ const Forecasting = () => {
 
           {data.reorderRecommendations.filter(r => r.priority === 'Urgent').length > 0 && (
             <div className="insight-card alert">
-              <div className="insight-icon">⚠️</div>
+              <div className="insight-icon"><AppIcon name="alert" /></div>
               <div className="insight-content">
                 <h4>Stock Alert</h4>
                 <p>
@@ -415,7 +416,7 @@ const Forecasting = () => {
           )}
 
           <div className="insight-card">
-            <div className="insight-icon">💡</div>
+            <div className="insight-icon"><AppIcon name="idea" /></div>
             <div className="insight-content">
               <h4>Best Category</h4>
               <p>

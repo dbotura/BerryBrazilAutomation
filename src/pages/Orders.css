@@ -2,6 +2,29 @@
   padding-bottom: 2rem;
 }
 
+.orders-subtitle {
+  margin-top: 0.25rem;
+  color: #64748b;
+}
+
+.orders-header-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.orders-message {
+  padding: 1rem 1.25rem;
+  background: #ffffff;
+  border-radius: 12px;
+  color: #475569;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.orders-message.error {
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
 .orders-list {
   display: flex;
   flex-direction: column;
@@ -48,6 +71,11 @@
   color: #047857;
 }
 
+.status-saved {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
 .status-pending {
   background: #FFF5E6;
   color: #D97706;
@@ -62,6 +90,12 @@
 .order-customer {
   font-size: 1rem;
   color: #1a202c;
+  font-weight: 600;
+}
+
+.order-meta {
+  font-size: 0.9rem;
+  color: #64748b;
 }
 
 .order-details {
@@ -75,4 +109,111 @@
   font-size: 1.25rem;
   font-weight: 700;
   color: #6B46C1;
+}
+
+.order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.order-modal {
+  max-width: 720px;
+}
+
+.order-modal textarea,
+.order-modal select {
+  padding: 0.75rem;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #fff;
+  width: 100%;
+}
+
+.order-line-builder {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.order-line-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.order-line-empty {
+  padding: 1rem;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  color: #64748b;
+}
+
+.order-line-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.order-line-name {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.order-line-price {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-top: 0.2rem;
+}
+
+.order-line-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.order-line-controls button {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #cbd5e1;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.order-line-total {
+  font-weight: 700;
+  color: #6B46C1;
+}
+
+.order-form-total {
+  text-align: right;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.status-cancelled {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+@media (max-width: 720px) {
+  .orders-header-actions,
+  .order-line-builder {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .order-line-item {
+    grid-template-columns: 1fr;
+  }
 }

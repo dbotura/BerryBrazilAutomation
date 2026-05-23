@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import AppIcon from '../components/AppIcon';
 import './GrowthProjections.css';
 
 const GrowthProjections = () => {
@@ -174,7 +175,7 @@ const GrowthProjections = () => {
       {/* Current Status */}
       <div className="status-cards">
         <div className="status-card">
-          <div className="status-icon">👥</div>
+          <div className="status-icon"><AppIcon name="customers" /></div>
           <div className="status-content">
             <div className="status-label">Current Customer Base</div>
             <div className="status-value">
@@ -185,7 +186,7 @@ const GrowthProjections = () => {
         </div>
 
         <div className="status-card">
-          <div className="status-icon">📈</div>
+          <div className="status-icon"><AppIcon name="trendUp" /></div>
           <div className="status-content">
             <div className="status-label">Projected in 24 Months</div>
             <div className="status-value">
@@ -198,7 +199,7 @@ const GrowthProjections = () => {
         </div>
 
         <div className="status-card">
-          <div className="status-icon">📦</div>
+          <div className="status-icon"><AppIcon name="package" /></div>
           <div className="status-content">
             <div className="status-label">Product Lines Configured</div>
             <div className="status-value">
@@ -215,19 +216,19 @@ const GrowthProjections = () => {
           className={`tab ${activeTab === 'customer' ? 'active' : ''}`}
           onClick={() => setActiveTab('customer')}
         >
-          👥 Customer Projections
+          <AppIcon name="customers" className="icon-inline" />Customer Projections
         </button>
         <button
           className={`tab ${activeTab === 'product' ? 'active' : ''}`}
           onClick={() => setActiveTab('product')}
         >
-          📦 Product Metrics
+          <AppIcon name="package" className="icon-inline" />Product Metrics
         </button>
         <button
           className={`tab ${activeTab === 'forecast' ? 'active' : ''}`}
           onClick={() => setActiveTab('forecast')}
         >
-          🔮 Sales Forecast
+          <AppIcon name="chart" className="icon-inline" />Sales Forecast
         </button>
       </div>
 
@@ -303,7 +304,7 @@ const GrowthProjections = () => {
                               className="btn-save"
                               onClick={() => handleSaveProjection(month, formData.newCustomers, formData.notes)}
                             >
-                              ✓ Save
+                              <AppIcon name="check" className="icon-inline" />Save
                             </button>
                             <button
                               className="btn-cancel"
@@ -312,7 +313,7 @@ const GrowthProjections = () => {
                                 setFormData({});
                               }}
                             >
-                              ✕
+                              <AppIcon name="close" />
                             </button>
                           </div>
                         ) : (
@@ -326,7 +327,7 @@ const GrowthProjections = () => {
                               });
                             }}
                           >
-                            ✏️ Edit
+                            <AppIcon name="edit" className="icon-inline" />Edit
                           </button>
                         )}
                       </td>
@@ -353,7 +354,8 @@ const GrowthProjections = () => {
                 <div className="metric-header">
                   <h4>{metric.product_name || metric.category_name}</h4>
                   <span className="metric-type">
-                    {metric.product_name ? '📦 Product' : '📁 Category'}
+                    <AppIcon name={metric.product_name ? 'package' : 'folder'} className="icon-inline" />
+                    {metric.product_name ? 'Product' : 'Category'}
                   </span>
                 </div>
                 <div className="metric-values">
@@ -373,7 +375,7 @@ const GrowthProjections = () => {
                 {metric.notes && (
                   <div className="metric-notes">{metric.notes}</div>
                 )}
-                <button className="btn-edit-metric">✏️ Edit</button>
+                <button className="btn-edit-metric"><AppIcon name="edit" className="icon-inline" />Edit</button>
               </div>
             ))}
 

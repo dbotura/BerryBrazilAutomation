@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import AppIcon from '../components/AppIcon'
 import './Stock.css'
 
 const Stock = () => {
@@ -29,7 +30,7 @@ const Stock = () => {
               </div>
             </div>
             {item.status === 'low' && (
-              <div className="stock-alert">⚠️ Low Stock</div>
+              <div className="stock-alert"><AppIcon name="alert" className="icon-inline" />Low Stock</div>
             )}
           </div>
         ))}

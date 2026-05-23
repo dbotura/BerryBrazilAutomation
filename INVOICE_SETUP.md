@@ -86,6 +86,17 @@ Create `.env.local`:
 ```bash
 DATABASE_URL=your_neon_connection_string
 RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxx
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_xxxxxxxxxxxx
+INVOICE_TEST_MODE=true
+INVOICE_TEST_RECIPIENT=your-test-inbox@example.com
+GOOGLE_DRIVE_ENABLED=false
+GOOGLE_DRIVE_TEST_FOLDER_ID=your_google_drive_test_folder_id
+# GOOGLE_DRIVE_FOLDER_ID=your_google_drive_production_folder_id
+# GOOGLE_OAUTH_CLIENT_ID=your-google-oauth-client-id.apps.googleusercontent.com
+# GOOGLE_OAUTH_CLIENT_SECRET=your-google-oauth-client-secret
+# GOOGLE_OAUTH_REFRESH_TOKEN=your-google-oauth-refresh-token
+# GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL=invoice-drive-uploader@your-project.iam.gserviceaccount.com
+# GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 COMPANY_EMAIL=invoices@yourdomain.com
 COMPANY_NAME=Berry Brazil Açai
 COMPANY_ADDRESS=123 Açai Street, Sydney NSW 2000, Australia
@@ -118,7 +129,62 @@ This installs:
 - `@react-pdf/renderer` - PDF generation
 - `resend` - Email delivery
 
-## Step 5: Test the System
+## Step 5: Configure Google Drive Storage (Optional but supported)
+
+If you want every generated invoice PDF copied into Google Drive, configure one of the supported Google auth methods below.
+
+### Required Drive Variables
+
+```bash
+GOOGLE_DRIVE_ENABLED=true
+GOOGLE_DRIVE_TEST_FOLDER_ID=your_google_drive_test_folder_id
+# GOOGLE_DRIVE_FOLDER_ID=your_google_drive_production_folder_id
+```
+
+- `GOOGLE_DRIVE_TEST_FOLDER_ID` is used while `INVOICE_TEST_MODE=true`.
+- `GOOGLE_DRIVE_FOLDER_ID` is used when test mode is off.
+- If Drive upload fails, invoice generation still succeeds and the error is logged server-side.
+
+### Option A: OAuth Refresh Token
+
+Use this when uploading into a personal Google Drive folder owned by your Google account.
+
+```bash
+GOOGLE_OAUTH_CLIENT_ID=your-google-oauth-client-id.apps.googleusercontent.com
+GOOGLE_OAUTH_CLIENT_SECRET=your-google-oauth-client-secret
+GOOGLE_OAUTH_REFRESH_TOKEN=your-google-oauth-refresh-token
+```
+
+Setup flow:
+1. Create a Google Cloud project.
+2. Enable the Google Drive API.
+3. Create an OAuth client.
+4. Generate a refresh token with Drive scope.
+5. Paste the client ID, client secret, and refresh token into your env vars.
+
+### Option B: Service Account
+
+Use this when uploading into a Shared Drive, or into a normal folder that has been explicitly shared with the service account email.
+
+```bash
+GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL=invoice-drive-uploader@your-project.iam.gserviceaccount.com
+GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+```
+
+Setup flow:
+1. Create a service account in Google Cloud.
+2. Enable the Google Drive API.
+3. Generate a JSON key.
+4. Copy the client email and private key into env vars.
+5. Share the destination Drive folder with the service account email, or add the service account to the Shared Drive.
+
+### Local Testing Notes
+
+- Keep `INVOICE_TEST_MODE=true` while validating the integration.
+- Point `GOOGLE_DRIVE_TEST_FOLDER_ID` at a dedicated test folder.
+- If you are using a service account with a personal My Drive folder and uploads fail with permissions errors, move to a Shared Drive or switch to OAuth refresh-token credentials.
+
+## Step 6: Test the System
 
 ### Test Invoice Generation (Manual)
 
@@ -137,6 +203,11 @@ curl -X POST http://localhost:3000/api/generate-invoice \
 
 # Open test-invoice.pdf to verify
 ```
+
+After the API call succeeds, verify that:
+- the PDF downloaded locally
+- the invoice row got a `pdf_url`
+- the PDF appeared in your Google Drive test folder if `GOOGLE_DRIVE_ENABLED=true`
 
 ### Test Email Sending
 
@@ -181,7 +252,7 @@ PUT /api/update-order-status
 
 3. Invoice should be automatically generated and emailed!
 
-## Step 6: Customize Invoice Template
+## Step 7: Customize Invoice Template
 
 Edit `api/lib/invoice-template.js` to customize:
 
