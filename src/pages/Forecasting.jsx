@@ -45,82 +45,6 @@ function addMonths(monthKey, offset) {
   return monthKeyFromParts(date.getFullYear(), date.getMonth() + 1)
 }
 
-function weekStart(date) {
-  const copy = new Date(date)
-  const diff = (copy.getDay() + 6) % 7
-  copy.setDate(copy.getDate() - diff)
-  copy.setHours(0, 0, 0, 0)
-  return copy
-}
-
-function isoDate(date) {
-  return date.toISOString().slice(0, 10)
-}
-
-function confidence(row) {
-  if (!row.tyActual) return 'Low'
-  if ((row.customersBuying || 0) >= 5 && (row.saleItemRows || 0) >= 8) return 'High'
-  if ((row.customersBuying || 0) >= 2) return 'Medium'
-  return 'Low'
-}
-
-function expandMonthlyRowsToWeeks(rows, startingSoh) {
-  if (!rows.length) return []
-
-  const weeklyRows = []
-  let soh = startingSoh
-
-  for (const row of rows) {
-    const monthKey = row.tyMonthKey
-    const forecastUnits = row.tyForecast
-    if (!monthKey || forecastUnits == null) continue
-
-    const start = monthStartDate(monthKey)
-    const end = new Date(start.getFullYear(), start.getMonth() + 1, 0)
-    const monthWeeks = []
-    let cursor = weekStart(start)
-
-    while (cursor <= end) {
-      const weekEnd = new Date(cursor)
-      weekEnd.setDate(weekEnd.getDate() + 6)
-      const activeStart = cursor < start ? start : cursor
-      const activeEnd = weekEnd > end ? end : weekEnd
-      const activeDays = Math.round((activeEnd - activeStart) / 86400000) + 1
-      monthWeeks.push({
-        weekStart: isoDate(cursor),
-        label: cursor.toLocaleDateString('en-AU', { day: '2-digit', month: 'short' }),
-        monthLabel: row.monthLabel,
-        activeDays,
-      })
-      cursor = new Date(cursor)
-      cursor.setDate(cursor.getDate() + 7)
-    }
-
-    const totalDays = monthWeeks.reduce((sum, week) => sum + week.activeDays, 0)
-    let allocated = 0
-
-    for (let index = 0; index < monthWeeks.length; index += 1) {
-      const week = monthWeeks[index]
-      const rawUnits = totalDays ? (forecastUnits * week.activeDays) / totalDays : 0
-      const weeklyForecast =
-        index === monthWeeks.length - 1 ? forecastUnits - allocated : Math.round(rawUnits)
-      allocated += weeklyForecast
-      const weeklyIntake = index === 0 ? row.intakeUnits : 0
-      soh = soh == null ? null : soh + weeklyIntake - weeklyForecast
-
-      weeklyRows.push({
-        ...week,
-        weeklyForecast,
-        intakeUnits: weeklyIntake,
-        shrinkageUnits: 0,
-        projectedSoh: soh,
-      })
-    }
-  }
-
-  return weeklyRows
-}
-
 function expandRollingRowsToPatternWeeks(rows, startingSoh, weeklyLyActualMap) {
   if (!rows.length) return []
 
@@ -160,6 +84,23 @@ function expandRollingRowsToPatternWeeks(rows, startingSoh, weeklyLyActualMap) {
   return weeklyRows
 }
 
+function replaceByProductMonth(rows, replacement) {
+  if (!replacement) return rows
+  return [
+    ...rows.filter(
+      (row) =>
+        !(String(row.product_id) === String(replacement.product_id) && row.month_key === replacement.month_key)
+    ),
+    replacement,
+  ]
+}
+
+function removeByProductMonth(rows, productId, monthKey) {
+  return rows.filter(
+    (row) => !(String(row.product_id) === String(productId) && row.month_key === monthKey)
+  )
+}
+
 export default function Forecasting() {
   const [payload, setPayload] = useState({
     products: [],
@@ -175,7 +116,6 @@ export default function Forecasting() {
   const [forecastDrafts, setForecastDrafts] = useState({})
   const [intakeDrafts, setIntakeDrafts] = useState({})
   const [openingStockDrafts, setOpeningStockDrafts] = useState({})
-  const [savingMonthKey, setSavingMonthKey] = useState('')
   const [committingTarget, setCommittingTarget] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -227,7 +167,6 @@ export default function Forecasting() {
             actualUnits: Number(row.actual_units),
             customersBuying: Number(row.customers_buying),
             unitsPerCustomer: row.units_per_customer == null ? null : Number(row.units_per_customer),
-            saleItemRows: Number(row.sale_item_rows),
           },
         ])
     )
@@ -243,7 +182,6 @@ export default function Forecasting() {
           {
             forecastUnits: Number(row.forecast_units),
             targetUnits: row.target_units == null ? null : Number(row.target_units),
-            targetCommittedAt: row.target_committed_at || null,
           },
         ])
     )
@@ -319,13 +257,11 @@ export default function Forecasting() {
         tyActual: tyActual?.actualUnits ?? null,
         tyForecast,
         targetUnits: forecastState?.targetUnits ?? null,
-        targetCommittedAt: forecastState?.targetCommittedAt ?? null,
         intakeUnits,
         forecastDraft: forecastValue,
         intakeDraft: intakeValue,
         customersBuying: tyActual?.customersBuying ?? null,
         unitsPerCustomer: tyActual?.unitsPerCustomer ?? null,
-        saleItemRows: tyActual?.saleItemRows ?? null,
         variancePct,
         projectedSoh,
       }
@@ -416,20 +352,18 @@ export default function Forecasting() {
         tyActual: tyActual?.actualUnits ?? null,
         tyForecast,
         targetUnits: forecastState?.targetUnits ?? null,
-        targetCommittedAt: forecastState?.targetCommittedAt ?? null,
         intakeUnits,
         openingStockDraft: openingStockValue,
         forecastDraft: forecastValue,
         intakeDraft: intakeValue,
         customersBuying: tyActual?.customersBuying ?? null,
         unitsPerCustomer: tyActual?.unitsPerCustomer ?? null,
-        saleItemRows: tyActual?.saleItemRows ?? null,
         variancePct,
         projectedSoh,
         monthsCover,
       }
     })
-  }, [selectedProduct, rollingStartMonthKey, productActualMap, productForecastMap, forecastDrafts, intakeDrafts, openingStockDrafts, productIntakeMap, currentMonthKey, productOpeningStockMap])
+  }, [selectedProduct, rollingStartMonthKey, productActualMap, productForecastMap, forecastDrafts, intakeDrafts, openingStockDrafts, productIntakeMap, productOpeningStockMap])
 
   const rollingYearLabels = useMemo(() => {
     if (!rollingStartMonthKey) return { current: currentFyLabel, previous: previousFyLabel }
@@ -463,7 +397,6 @@ export default function Forecasting() {
     }
 
     try {
-      setSavingMonthKey(row.tyMonthKey)
       setError('')
       const saved = await api.updateLineFlowForecast({
         productId: selectedProduct.id,
@@ -475,15 +408,7 @@ export default function Forecasting() {
       })
 
       setPayload((current) => {
-        const nextForecasts = saved.forecast
-          ? [
-              ...current.monthlyForecasts.filter(
-                (item) =>
-                  !(String(item.product_id) === String(saved.forecast.product_id) && item.month_key === saved.forecast.month_key)
-              ),
-              saved.forecast,
-            ]
-          : current.monthlyForecasts
+        const nextForecasts = replaceByProductMonth(current.monthlyForecasts, saved.forecast)
 
         const nextOverrides = saved.weeklyOverride
           ? [
@@ -496,18 +421,9 @@ export default function Forecasting() {
           : current.weeklyOverrides
 
         const nextOpeningOverrides = saved.openingStockOverride
-          ? [
-              ...current.openingStockOverrides.filter(
-                (item) =>
-                  !(String(item.product_id) === String(saved.openingStockOverride.product_id) && item.month_key === saved.openingStockOverride.month_key)
-              ),
-              saved.openingStockOverride,
-            ]
+          ? replaceByProductMonth(current.openingStockOverrides, saved.openingStockOverride)
           : row.openingStockDraft === ''
-            ? current.openingStockOverrides.filter(
-                (item) =>
-                  !(String(item.product_id) === String(selectedProduct.id) && item.month_key === row.tyMonthKey)
-              )
+            ? removeByProductMonth(current.openingStockOverrides, selectedProduct.id, row.tyMonthKey)
             : current.openingStockOverrides
 
         return {
@@ -519,8 +435,6 @@ export default function Forecasting() {
       })
     } catch (err) {
       setError(err.message || 'Failed to save forecast')
-    } finally {
-      setSavingMonthKey('')
     }
   }
 
@@ -542,7 +456,6 @@ export default function Forecasting() {
     }
 
     try {
-      setSavingMonthKey(monthKey)
       setError('')
       const saved = await api.updateLineFlowForecast({
         productId: selectedProduct.id,
@@ -552,17 +465,8 @@ export default function Forecasting() {
 
       setPayload((current) => {
         const nextOpeningOverrides = saved.openingStockOverride
-          ? [
-              ...current.openingStockOverrides.filter(
-                (item) =>
-                  !(String(item.product_id) === String(saved.openingStockOverride.product_id) && item.month_key === saved.openingStockOverride.month_key)
-              ),
-              saved.openingStockOverride,
-            ]
-          : current.openingStockOverrides.filter(
-              (item) =>
-                !(String(item.product_id) === String(selectedProduct.id) && item.month_key === monthKey)
-            )
+          ? replaceByProductMonth(current.openingStockOverrides, saved.openingStockOverride)
+          : removeByProductMonth(current.openingStockOverrides, selectedProduct.id, monthKey)
 
         return {
           ...current,
@@ -571,8 +475,6 @@ export default function Forecasting() {
       })
     } catch (err) {
       setError(err.message || 'Failed to save opening stock override')
-    } finally {
-      setSavingMonthKey('')
     }
   }
 
@@ -683,10 +585,10 @@ export default function Forecasting() {
       {activeView === 'monthly' && (
         <>
           <div className="card">
-            <h3 className="section-title">Monly Overview</h3>
-                <p className="chart-subtitle">
+            <h3 className="section-title">Monthly Overview</h3>
+            <p className="chart-subtitle">
               Fiscal window runs July through June. The chart overlays {previousFyLabel} actual, {currentFyLabel} actual, the working forecast, and the committed target snapshot.
-                </p>
+            </p>
             <ResponsiveContainer width="100%" height={360}>
               <ComposedChart data={chartRows}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -734,17 +636,17 @@ export default function Forecasting() {
                 <thead>
                   <tr>
                     <th>Month</th>
-                      <th>{rollingYearLabels.previous} Actual</th>
-                      <th>{rollingYearLabels.current} Actual</th>
-                      <th>{rollingYearLabels.current} Forecast</th>
-                      <th>Target</th>
-                      <th>Intake</th>
-                      <th>SOH</th>
-                      <th>Months Cover</th>
-                      <th>% Var</th>
-                      <th>Customers</th>
-                      <th>Units / Customer</th>
-                      <th>New Opening Stock</th>
+                    <th>{rollingYearLabels.previous} Actual</th>
+                    <th>{rollingYearLabels.current} Actual</th>
+                    <th>{rollingYearLabels.current} Forecast</th>
+                    <th>Target</th>
+                    <th>Intake</th>
+                    <th>SOH</th>
+                    <th>Months Cover</th>
+                    <th>% Var</th>
+                    <th>Customers</th>
+                    <th>Units / Customer</th>
+                    <th>New Opening Stock</th>
                   </tr>
                 </thead>
                 <tbody>

@@ -128,8 +128,6 @@ export default async function handler(req, res) {
             TO_CHAR(week_start_date, 'YYYY-MM-DD') AS week_start_date,
             TO_CHAR(${forecastMonth}::date, 'YYYY-MM-01') AS month_key,
             intake_override_units,
-            forecast_override_units,
-            shrinkage_override_units,
             notes
         `;
         weeklyOverrideResult = result[0];
@@ -176,15 +174,8 @@ export default async function handler(req, res) {
       SELECT
         p.id,
         p.name,
-        c.name AS category_name,
-        p.stock,
-        p.lead_time_weeks,
-        p.safety_stock_units,
-        p.target_cover_weeks,
-        p.default_shrinkage_rate,
-        p.supplier_name
+        p.stock
       FROM products p
-      LEFT JOIN categories c ON c.id = p.category_id
       ORDER BY p.name
     `;
 
@@ -201,8 +192,7 @@ export default async function handler(req, res) {
             ELSE SUM(si.quantity)::numeric / COUNT(DISTINCT COALESCE(s.customer_id::text, s.customer, s.source_file))::numeric
           END,
           2
-        ) AS units_per_customer,
-        COUNT(*)::int AS sale_item_rows
+        ) AS units_per_customer
       FROM sale_items si
       JOIN sales s ON s.id = si.sale_id
       JOIN products p ON p.id = si.product_id
@@ -231,9 +221,7 @@ export default async function handler(req, res) {
         product_id,
         TO_CHAR(week_start_date, 'YYYY-MM-DD') AS week_start_date,
         TO_CHAR(DATE_TRUNC('month', week_start_date + INTERVAL '6 days'), 'YYYY-MM-01') AS month_key,
-        forecast_override_units,
         intake_override_units,
-        shrinkage_override_units,
         notes
       FROM product_weekly_overrides
       ORDER BY week_start_date, product_id
