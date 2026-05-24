@@ -23,6 +23,9 @@ async function fetchAPI(endpoint, options = {}) {
 }
 
 export const api = {
+  // Dashboard
+  getDashboard: () => fetchAPI('/dashboard'),
+
   // Line Flow
   getLineFlow: () => fetchAPI('/line-flow'),
   updateLineFlowForecast: (data) =>
