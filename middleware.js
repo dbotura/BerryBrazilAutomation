@@ -1,6 +1,18 @@
 const ACCESS_COOKIE = 'site_access'
 const PUBLIC_PATHS = new Set(['/auth', '/api/auth'])
 
+function getCookieValue(cookieHeader, key) {
+  if (!cookieHeader) return null
+  const pairs = cookieHeader.split(';')
+  for (const pair of pairs) {
+    const [rawName, ...rest] = pair.trim().split('=')
+    if (rawName === key) {
+      return rest.join('=')
+    }
+  }
+  return null
+}
+
 export default function middleware(request) {
   if (!process.env.VERCEL) {
     return
@@ -21,7 +33,8 @@ export default function middleware(request) {
     return
   }
 
-  const hasAccess = request.cookies.get(ACCESS_COOKIE)?.value === '1'
+  const cookieHeader = request.headers.get('cookie')
+  const hasAccess = getCookieValue(cookieHeader, ACCESS_COOKIE) === '1'
   if (!hasAccess) {
     const redirectTo = encodeURIComponent(`${pathname}${search}`)
     return Response.redirect(new URL(`/auth?next=${redirectTo}`, request.url), 307)
