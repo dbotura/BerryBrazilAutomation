@@ -1,0 +1,9 @@
+api/categories.js
+api/generate-invoice.js
+api/growth-projections.js
+api/invoices.js
+api/orders.js
+api/products.js
+api/sales.js
+api/stock-movements.js
+api/update-order-status.js
