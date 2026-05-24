@@ -1,5 +1,5 @@
 const ACCESS_COOKIE = 'site_access'
-const PUBLIC_PATHS = new Set(['/auth', '/api/auth'])
+const PUBLIC_PATHS = new Set(['/auth.html', '/api/auth'])
 
 function getCookieValue(cookieHeader, key) {
   if (!cookieHeader) return null
@@ -37,7 +37,7 @@ export default function middleware(request) {
   const hasAccess = getCookieValue(cookieHeader, ACCESS_COOKIE) === '1'
   if (!hasAccess) {
     const redirectTo = encodeURIComponent(`${pathname}${search}`)
-    return Response.redirect(new URL(`/auth?next=${redirectTo}`, request.url), 307)
+    return Response.redirect(new URL(`/auth.html?next=${redirectTo}`, request.url), 307)
   }
 
   return
